@@ -1,19 +1,18 @@
 package com.ReVerb;
 
+
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
-@ConfigGroup("example")
-public interface ReVerbConfig extends Config
-{
+@ConfigGroup("reverbVars")
+public interface ReVerbConfig extends Config {
 	@ConfigItem(
-		keyName = "greeting",
-		name = "Welcome Greeting",
-		description = "The message to show to the user when they login"
+			keyName = "replaceList",
+			name = "Replacements list",
+			description = "Format: 'Example Option:Replacement text' pairs, seperated by semicolons (;)"
 	)
-	default String greeting()
-	{
-		return "Hello";
+	default String inputString() {
+		return "";
 	}
 }
