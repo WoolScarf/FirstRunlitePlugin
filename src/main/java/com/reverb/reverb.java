@@ -1,4 +1,4 @@
-package com.ReVerb;
+package com.reverb;
 
 
 import com.google.inject.Provides;

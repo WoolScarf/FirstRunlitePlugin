@@ -1,4 +1,4 @@
-package com.ReVerb;
+package com.reverb;
 
 
 import net.runelite.client.config.Config;
