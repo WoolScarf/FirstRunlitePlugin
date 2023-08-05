@@ -8,7 +8,7 @@ import net.runelite.client.config.ConfigItem;
 import java.awt.*;
 
 @ConfigGroup("reverbVars")
-public interface ReVerbConfig extends Config {
+public interface reverbconfig extends Config {
 
 
 	@ConfigItem(

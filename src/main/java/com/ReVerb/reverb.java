@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 	name = "ReVerb"
 )
 
-public class ReVerb extends Plugin
+public class reverb extends Plugin
 {
 	Pattern p = Pattern.compile("[^-a-zA-z:;0-9\\s]");
 
@@ -27,7 +27,7 @@ public class ReVerb extends Plugin
 	private Client client;
 
 	@Inject
-	private ReVerbConfig config;
+	private reverbconfig config;
 
 	String[] forbiddenChanges = {"Walk here", "Cancel"};
 
@@ -172,8 +172,8 @@ public class ReVerb extends Plugin
 
 
 	@Provides
-	ReVerbConfig provideConfig(ConfigManager configManager)
+	reverbconfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(ReVerbConfig.class);
+		return configManager.getConfig(reverbconfig.class);
 	}
 }
