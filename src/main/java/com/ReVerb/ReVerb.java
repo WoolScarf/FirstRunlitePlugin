@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 public class ReVerb extends Plugin
 {
-	Pattern p = Pattern.compile("[^a-zA-z:;\\s]");
+	Pattern p = Pattern.compile("[^-a-zA-z:;0-9\\s]");
 
 	@Inject
 	private Client client;
@@ -29,7 +29,8 @@ public class ReVerb extends Plugin
 	@Inject
 	private ReVerbConfig config;
 
-	boolean sentInputError = false;
+
+	boolean sentNonAlphaInput = false;
 	boolean sentEmptyStringError = false;
 	boolean sentBadFormatError = false;
 	boolean sentEmptyInputError = false;
@@ -45,31 +46,31 @@ public class ReVerb extends Plugin
 
 		// Confirm only intended chars exist
 		// Notify player, only once until the problem is fixed. Once fixed, another mistake will give another error message
-		if ( containsNonAlpha(userInput) ){
-			if (!sentInputError) {
-				client.addChatMessage(ChatMessageType.PLAYERRELATED, "", "ReVerb plugin disabled, you can only input English letters, ': (colon)' or '; (semicolon)'", "ReVerb Plugin:");
-				sentInputError = true;
-				sentWellWritten = false;
+		if (containsNonAlpha(userInput)) {
+			if (!sentNonAlphaInput) {
+				client.addChatMessage(ChatMessageType.PLAYERRELATED, "", "ReVerb only works with English letters, '-' (dash) ':' (colon) or ';' (semicolon)", "ReVerb Plugin:");
+				sentNonAlphaInput = true;
 			}
+			wellWrittenInput = false;
+			sentWellWritten = false;
 			return;
 		}
-		sentInputError = false;
-
+		sentNonAlphaInput = false;
 
 		// Find pairs between semicolons, split into distinct strings
 		String[] inputParsedIntoPairs = userInput.split(";");
 
 		// Check fo
-		if ( inputParsedIntoPairs.length == 0)
-		{
+		if (inputParsedIntoPairs.length == 1 && inputParsedIntoPairs[0].isEmpty()) {
 			if (!sentEmptyInputError) {
-				client.addChatMessage(ChatMessageType.PLAYERRELATED, "", "ReVerb plugin disabled, please add something to replace!", "ReVerb Plugin:");
+				client.addChatMessage(ChatMessageType.PLAYERRELATED, "", "ReVerb found nothing to replace!", "");
 				sentEmptyInputError = true;
-				wellWrittenInput = false;
-				sentWellWritten = false;
 			}
+			wellWrittenInput = false;
+			sentWellWritten = false;
 			return;
 		}
+		sentEmptyInputError = false;
 
 
 		// Parse pair into search and replace strings
@@ -79,53 +80,67 @@ public class ReVerb extends Plugin
 			String[] pairStrings = parsedPairs.split(":");
 
 			// If format doesn't fit, skip
-			if (pairStrings.length > 2)
-			{
-				if (!sentBadFormatError)
-				{
+			if (pairStrings.length != 2){
+				if (!sentBadFormatError) {
 					client.addChatMessage(
 							ChatMessageType.PLAYERRELATED,
 							"",
-							"ReVerb skipped a replacement, make sure to separate pairs with a semicolon (;)!",
+							"ReVerb found an invalid pair! make sure to separate pairs with a semicolon (;)!",
 							""
 					);
 					sentBadFormatError = true;
-					wellWrittenInput = false;
-					sentWellWritten = false;
 				}
+				wellWrittenInput = false;
+				sentWellWritten = false;
+				continue;
+			}
 
-			} else if (pairStrings.length == 0 || pairStrings.length == 1) {
-				if (!sentEmptyStringError)
-				{
+			// At this point we know there is a "good" pair
+			pairStrings[0] = pairStrings[0].trim();
+			pairStrings[1] = pairStrings[1].trim();
+
+
+			if (pairStrings[0].length() == 0 || pairStrings[1].length() == 0)
+			{
+				if (!sentEmptyStringError) {
 					client.addChatMessage(
 							ChatMessageType.PLAYERRELATED,
 							"",
-							"ReVerb skipped a replacement, there might be a stray colon (:) or an incomplete pair somewhere!",
+							"ReVerb found an empty phrase! There might be a misplaced colon (:) or an incomplete pair somewhere!",
 							""
 					);
 					sentEmptyStringError = true;
-					wellWrittenInput = false;
-					sentWellWritten = false;
 				}
-			} else {
-				if (menuEntryAdded.getOption().equals(pairStrings[0].trim())) {
-					menuEntryAdded.getMenuEntry().setOption(pairStrings[1].trim());
-				}
-				if (wellWrittenInput)
-				{
-					sentEmptyStringError = false;
-					sentBadFormatError = false;
-					sentInputError = false;
-					if (!sentWellWritten) {
-						client.addChatMessage(
-								ChatMessageType.PLAYERRELATED,
-								"",
-								"ReVerb is working! If something doesn't look right. make sure capitalizations are correct!",
-								""
-						);
-						sentWellWritten = true;
-					}
-				}
+				wellWrittenInput = false;
+				sentWellWritten = false;
+				continue;
+			}
+
+			// Passed all checks, apply change
+			if (menuEntryAdded.getOption().equals(pairStrings[0]))
+			{
+				String color = String.format("%02x%02x%02x",
+						config.highlightColor().getRed(),
+						config.highlightColor().getGreen(),
+						config.highlightColor().getBlue());
+				menuEntryAdded.getMenuEntry().setOption("<col=" + color + ">" + pairStrings[1]);
+			}
+		}
+
+		if (wellWrittenInput)
+		{
+			sentEmptyStringError = false;
+			sentBadFormatError = false;
+			sentNonAlphaInput = false;
+			if (!sentWellWritten)
+			{
+				client.addChatMessage(
+						ChatMessageType.PLAYERRELATED,
+						"",
+						"ReVerb is working! If something doesn't look right. make sure capitalizations are correct!",
+						""
+				);
+				sentWellWritten = true;
 			}
 		}
 	}
