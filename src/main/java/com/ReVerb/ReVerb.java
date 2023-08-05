@@ -29,11 +29,13 @@ public class ReVerb extends Plugin
 	@Inject
 	private ReVerbConfig config;
 
+	String[] forbiddenChanges = {"Walk here", "Cancel"};
 
 	boolean sentNonAlphaInput = false;
 	boolean sentEmptyStringError = false;
 	boolean sentBadFormatError = false;
 	boolean sentEmptyInputError = false;
+	boolean sentFoundForbiddenPhrase = false;
 	boolean wellWrittenInput = true;
 	boolean sentWellWritten = false;
 
@@ -116,6 +118,23 @@ public class ReVerb extends Plugin
 				continue;
 			}
 
+			for (String forbiddenPhrase : forbiddenChanges){
+				if (forbiddenPhrase.equals(pairStrings[0])){
+					if (!sentFoundForbiddenPhrase) {
+						client.addChatMessage(
+								ChatMessageType.PLAYERRELATED,
+								"",
+								"ReVerb found '" + forbiddenPhrase + "' as a phrase. This messes with things!",
+								""
+						);
+						sentFoundForbiddenPhrase = true;
+					}
+					wellWrittenInput = false;
+					sentWellWritten = false;
+					continue;
+				}
+			}
+
 			// Passed all checks, apply change
 			if (menuEntryAdded.getOption().equals(pairStrings[0]))
 			{
@@ -132,19 +151,20 @@ public class ReVerb extends Plugin
 			sentEmptyStringError = false;
 			sentBadFormatError = false;
 			sentNonAlphaInput = false;
+			sentFoundForbiddenPhrase = false;
+
 			if (!sentWellWritten)
 			{
 				client.addChatMessage(
 						ChatMessageType.PLAYERRELATED,
 						"",
-						"ReVerb is working! If something doesn't look right. make sure capitalizations are correct!",
+						"ReVerb is working! If something doesn't look right. Make sure capitalizations are correct!",
 						""
 				);
 				sentWellWritten = true;
 			}
 		}
 	}
-
 
 	public boolean containsNonAlpha(String name) {
 		return p.matcher(name).find();
