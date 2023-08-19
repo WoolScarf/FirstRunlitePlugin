@@ -7,5 +7,5 @@ Input format is "Menu Option:Replacement", leading and trailing whitespace is tr
 
 Example:
 *  "Eat:Consume" is the same as "        Eat   :  Consume     ;"
-*  "Walk here:Move" isn't the same as "Walk       here:Move"
+*  "Walk here:Move" isn't the same as "Walk [two spaces] here:Move" 
 * More than one change: "Talk-To : Pester ; Drop : Yeet"
