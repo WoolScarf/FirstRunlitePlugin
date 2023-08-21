@@ -9,3 +9,5 @@ Example:
 *  "Eat:Consume" is the same as "        Eat   :  Consume     ;"
 *  "Walk here:Move" isn't the same as "Walk [two spaces] here:Move" 
 * More than one change: "Talk-To : Pester ; Drop : Yeet"
+
+You should check Reword Manager out! That one changes the click target text, which means with both plugins you can completely customize the right-click menu text!
